@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaTech Inventory System</title>
+  <link rel="stylesheet" href="Inventory.css"/>
+
+  <style>
+   
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>NovaTech</h1>
+  <nav>
+    <a onclick="showDashboard()">Dashboard</a>
+    <a onclick="showAlerts()">View Inventory Alerts</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <h2>Smart Inventory Tracker</h2>
+    <p>Cloud-powered stock management system</p>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="section">
+  <h2>Add Inventory Item</h2>
+
+  <form id="form">
+    <input type="text" id="name" placeholder="Product Name" required>
+    <input type="number" id="quantity" placeholder="Quantity" required>
+    <input type="number" id="min" placeholder="Min Threshold" required>
+    <input type="number" id="max" placeholder="Max Threshold" required>
+    <button type="submit">Add Item</button>
+  </form>
+
+  <h2 style="margin-top:40px;">All Inventory</h2>
+  <div class="grid" id="items"></div>
+</section>
+
+<!-- ALERT VIEW -->
+<section id="alerts" class="section hidden">
+  <h2>Inventory Alerts</h2>
+  <div class="grid" id="alertItems"></div>
+</section>
+
+<footer>
+  <p>© 2026 NovaTech Inventory System</p>
+</footer>
+
+<script>
+const apiURL = "http://YOUR-EC2-PUBLIC-IP:5000";
+
+const form = document.getElementById('form');
+const itemsDiv = document.getElementById('items');
+const alertDiv = document.getElementById('alertItems');
+
+// Switch Views
+function showDashboard() {
+  document.getElementById('dashboard').classList.remove('hidden');
+  document.getElementById('alerts').classList.add('hidden');
+}
+
+function showAlerts() {
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('alerts').classList.remove('hidden');
+  loadAlerts();
+}
+
+// Add Item
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById('name').value;
+  const quantity = document.getElementById('quantity').value;
+  const min = document.getElementById('min').value;
+  const max = document.getElementById('max').value;
+
+  await fetch(apiURL + '/add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, quantity, min, max })
+  });
+
+  loadItems();
+});
+
+// Load All Items
+async function loadItems() {
+  const res = await fetch(apiURL + '/items');
+  const data = await res.json();
+
+  itemsDiv.innerHTML = '';
+
+  data.forEach(item => {
+    let color = "white";
+    if (item.alert.includes("LOW")) color = "orange";
+    if (item.alert.includes("OVER")) color = "red";
+    if (item.alert.includes("OK")) color = "lightgreen";
+
+    itemsDiv.innerHTML += `
+      <div class="card" style="border-left: 6px solid ${color}">
+        <h3>${item.name}</h3>
+        <p>Quantity: ${item.quantity}</p>
+        <p>Status: ${item.alert}</p>
+      </div>
+    `;
+  });
+}
+
+// Load Only Alerts
+async function loadAlerts() {
+  const res = await fetch(apiURL + '/items');
+  const data = await res.json();
+
+  alertDiv.innerHTML = '';
+
+  data.forEach(item => {
+    if (item.alert.includes("LOW") || item.alert.includes("OVER")) {
+      let color = item.alert.includes("LOW") ? "orange" : "red";
+
+      alertDiv.innerHTML += `
+        <div class="card" style="border-left: 6px solid ${color}">
+          <h3>${item.name}</h3>
+          <p>Quantity: ${item.quantity}</p>
+          <p>Status: ${item.alert}</p>
+        </div>
+      `;
+    }
+  });
+}
+
+loadItems();
+</script>
+
+</body>
+</html>
