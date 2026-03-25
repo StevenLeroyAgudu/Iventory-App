@@ -1,0 +1,21 @@
+Id,Product,Quantity,Min ,Max
+01,Milk,10,3,50
+02,Juice(Ceres),10,1,20
+03,Bread,10,5,50
+04,Cakes,20,5,50
+05,Spring rolls,20,3,30
+06,Sausage,20,10,60
+07,Eggs,20,10,30
+08,Baking powder,10,5,20
+09,Nutmeg,15,5,20
+10,Digestive biscuit,30,5,50
+11,Cream crakcers,30,5,50
+12,Lipton tea,45,10,70
+13,Cake bread,20,10,50
+14,Orange juice,5,2,10
+15,Apple Juice,5,2,10
+16,Ice cream,50,10,100
+17,Whip cream,35,5,100
+18,Carrot,40,20,80
+19,Cabbage,20,10,81
+20,Tomatoes,100,40,150
